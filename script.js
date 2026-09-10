@@ -1,16 +1,20 @@
 // -------- LOAD SAVED DATA OR USE DEFAULT --------
 const defaultTitle = "⚡ Thomas Edison";
 const defaultData = [
-    { title: "Thomas Edison", titleSize: 2.5, lines: ["1847 – 1931", "Milan, Ohio", "Inventor & Innovator"], textSize: 2.8 },
-    { title: "Key Inventions", titleSize: 2.5, lines: ["• Light Bulb (1879)", "• Phonograph (1877)", "• Motion Picture Camera", "• Electric Power Distribution"], textSize: 2.8 },
-    { title: "Menlo Park", titleSize: 2.5, lines: ["The First Industrial Lab", "Innovation & Teamwork", "New Jersey, USA"], textSize: 2.8 },
-    { title: "Famous Quotes", titleSize: 2.5, lines: ["• 'Genius is 1% inspiration…'", "• 'I have not failed…'", "• 'Just found 10,000 ways…'"], textSize: 2.8 },
-    { title: "Legacy", titleSize: 2.5, lines: ["1,093 Patents", "Holder of Light", "Died 1931"], textSize: 2.8 }
+    { title: "Thomas Edison", lines: ["1847 – 1931", "Milan, Ohio", "Inventor & Innovator"] },
+    { title: "Key Inventions", lines: ["• Light Bulb (1879)", "• Phonograph (1877)", "• Motion Picture Camera", "• Electric Power Distribution"] },
+    { title: "Menlo Park", lines: ["The First Industrial Lab", "Innovation & Teamwork", "New Jersey, USA"] },
+    { title: "Famous Quotes", lines: ["• 'Genius is 1% inspiration…'", "• 'I have not failed…'", "• 'Just found 10,000 ways…'"] },
+    { title: "Legacy", lines: ["1,093 Patents", "Holder of Light", "Died 1931"] }
 ];
 
 let savedState = JSON.parse(localStorage.getItem('presentationState'));
 let presentationTitle = (savedState && savedState.title) ? savedState.title : defaultTitle;
 let slidesData = (savedState && savedState.slides) ? savedState.slides : defaultData;
+
+// GLOBAL FONT SIZES (Applies to all pages)
+let globalTitleSize = (savedState && savedState.titleSize) ? savedState.titleSize : 2.5;
+let globalTextSize = (savedState && savedState.textSize) ? savedState.textSize : 2.8;
 
 // -------- DOM refs --------
 const wrapper = document.getElementById('slide-wrapper');
@@ -25,7 +29,9 @@ let currentIndex = 0;
 function saveToLocalStorage() {
     const state = {
         title: presentationTitle,
-        slides: slidesData
+        slides: slidesData,
+        titleSize: globalTitleSize,
+        textSize: globalTextSize
     };
     localStorage.setItem('presentationState', JSON.stringify(state));
 }
@@ -40,16 +46,31 @@ function renderSlides() {
         const contentDiv = document.createElement('div');
         contentDiv.classList.add('slide-content');
 
-        // Edit Icon
-        const editIcon = document.createElement('div');
+        // Icons Container (Edit Icon & Download Icon)
+        const iconsContainer = document.createElement('div');
+        iconsContainer.classList.add('icons-container');
+
+        const editIcon = document.createElement('button');
         editIcon.innerHTML = '✎';
-        editIcon.classList.add('edit-icon');
+        editIcon.classList.add('icon-btn');
         editIcon.title = "Edit Slide";
         editIcon.onclick = (e) => {
             e.stopPropagation();
             startEditMode(index);
         };
-        contentDiv.appendChild(editIcon);
+        iconsContainer.appendChild(editIcon);
+
+        const downloadBtn = document.createElement('button');
+        downloadBtn.innerHTML = '⬇';
+        downloadBtn.classList.add('icon-btn');
+        downloadBtn.title = "Download HTML";
+        downloadBtn.onclick = (e) => {
+            e.stopPropagation();
+            downloadHTML();
+        };
+        iconsContainer.appendChild(downloadBtn);
+
+        contentDiv.appendChild(iconsContainer);
 
         // Content Display Wrapper
         const displayContent = document.createElement('div');
@@ -62,14 +83,14 @@ function renderSlides() {
         if (slide.title) {
             const h3 = document.createElement('h3');
             h3.textContent = slide.title;
-            h3.style.fontSize = `${slide.titleSize || 2.5}rem`; 
+            h3.style.fontSize = `${globalTitleSize}rem`; // Apply Global Title Size
             displayContent.appendChild(h3);
         }
 
         slide.lines.forEach((line) => {
             const p = document.createElement('p');
             p.textContent = line;
-            p.style.fontSize = `${slide.textSize || 2.8}rem`; 
+            p.style.fontSize = `${globalTextSize}rem`; // Apply Global Text Size
             displayContent.appendChild(p);
         });
 
@@ -89,20 +110,20 @@ function renderSlides() {
             
             <div class="size-control-wrapper">
                 <div class="size-control">
-                    <span class="size-label">Title Size</span>
+                    <span class="size-label">Very Small</span>
                     <div class="size-input-group">
                         <button type="button" class="size-btn" onclick="adjustSize('title-size-input-${index}', -0.1)">-</button>
-                        <input type="number" class="size-input" id="title-size-input-${index}" value="${slide.titleSize || 2.5}" min="0.5" max="10" step="0.1">
+                        <input type="number" class="size-input" id="title-size-input-${index}" value="${globalTitleSize}" min="0.5" max="10" step="0.1">
                         <button type="button" class="size-btn" onclick="adjustSize('title-size-input-${index}', 0.1)">+</button>
                         <span class="unit-label">rem</span>
                     </div>
                 </div>
                 
                 <div class="size-control">
-                    <span class="size-label">Text Size</span>
+                    <span class="size-label">Very Small</span>
                     <div class="size-input-group">
                         <button type="button" class="size-btn" onclick="adjustSize('text-size-input-${index}', -0.1)">-</button>
-                        <input type="number" class="size-input" id="text-size-input-${index}" value="${slide.textSize || 2.8}" min="0.5" max="10" step="0.1">
+                        <input type="number" class="size-input" id="text-size-input-${index}" value="${globalTextSize}" min="0.5" max="10" step="0.1">
                         <button type="button" class="size-btn" onclick="adjustSize('text-size-input-${index}', 0.1)">+</button>
                         <span class="unit-label">rem</span>
                     </div>
@@ -114,7 +135,6 @@ function renderSlides() {
             
             <div class="form-buttons">
                 <div class="left-group">
-                    <button class="btn btn-download" onclick="downloadHTML()">Download</button>
                     <button class="btn btn-add-page" onclick="addPage(${index})">+ Add Page</button>
                     <button class="btn btn-cancel" onclick="cancelEdit(${index})">Cancel</button>
                 </div>
@@ -143,10 +163,10 @@ function startEditMode(index) {
         if (i === index) {
             const form = s.querySelector('.edit-form');
             const display = s.querySelector('.display-content');
-            const icon = s.querySelector('.edit-icon');
+            const icons = s.querySelector('.icons-container');
             if (form) form.classList.add('active');
             if (display) display.style.display = 'none';
-            if (icon) icon.style.display = 'none';
+            if (icons) icons.style.display = 'none';
         }
     });
 }
@@ -158,22 +178,21 @@ function saveChanges(index) {
 
     const titleInput = document.getElementById(`title-input-${index}`);
     const linesInput = document.getElementById(`lines-input-${index}`);
+    
+    // Save Global Font Sizes
     const titleSizeInput = document.getElementById(`title-size-input-${index}`);
     const textSizeInput = document.getElementById(`text-size-input-${index}`);
+    globalTitleSize = parseFloat(titleSizeInput.value) || 2.5;
+    globalTextSize = parseFloat(textSizeInput.value) || 2.8;
 
     const newTitle = titleInput.value.trim();
     const newLines = linesInput.value.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    const newTitleSize = parseFloat(titleSizeInput.value) || 2.5;
-    const newTextSize = parseFloat(textSizeInput.value) || 2.8;
 
     slidesData[index] = {
         title: newTitle,
-        titleSize: newTitleSize,
-        lines: newLines,
-        textSize: newTextSize
+        lines: newLines
     };
 
-    // Save to Local Storage
     saveToLocalStorage();
 
     renderSlides();
@@ -186,10 +205,10 @@ function cancelEdit(index) {
         if (i === index) {
             const form = s.querySelector('.edit-form');
             const display = s.querySelector('.display-content');
-            const icon = s.querySelector('.edit-icon');
+            const icons = s.querySelector('.icons-container');
             if (form) form.classList.remove('active');
             if (display) display.style.display = 'flex';
-            if (icon) icon.style.display = 'block';
+            if (icons) icons.style.display = 'flex';
         }
     });
 }
@@ -197,12 +216,9 @@ function cancelEdit(index) {
 function addPage(index) {
     slidesData.push({
         title: "New Slide",
-        titleSize: 2.5,
-        lines: ["Click edit to modify", "Add your content here"],
-        textSize: 2.8
+        lines: ["Click edit to modify", "Add your content here"]
     });
     
-    // Save newly added page to Local Storage
     saveToLocalStorage();
 
     renderSlides();
@@ -216,8 +232,8 @@ function downloadHTML() {
     let slidesHTML = '';
     slidesData.forEach((slide, index) => {
         let activeClass = index === 0 ? ' active' : ''; 
-        let titleHTML = slide.title ? `<h3 style="font-size: ${slide.titleSize}rem;">${slide.title}</h3>` : '';
-        let linesHTML = slide.lines.map(line => `<p style="font-size: ${slide.textSize}rem;">${line}</p>`).join('');
+        let titleHTML = slide.title ? `<h3 style="font-size: ${globalTitleSize}rem;">${slide.title}</h3>` : '';
+        let linesHTML = slide.lines.map(line => `<p style="font-size: ${globalTextSize}rem;">${line}</p>`).join('');
         
         slidesHTML += `
         <div class="slide${activeClass}">
@@ -370,7 +386,7 @@ function init() {
 
 const container = document.getElementById('main-container');
 container.addEventListener('click', (e) => {
-    if (e.target.closest('.edit-icon') || e.target.closest('.edit-form') || e.target.closest('button') || e.target.closest('.footer-recovered')) return;
+    if (e.target.closest('.icons-container') || e.target.closest('.edit-form') || e.target.closest('button') || e.target.closest('.footer-recovered')) return;
     const width = window.innerWidth;
     const clickX = e.clientX;
     const threshold = width * 0.3;
