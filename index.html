@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thomas Edison · Presentation</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #FFD700;
+            font-family: 'Noto Sans Ethiopic', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .presentation-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            padding-bottom: 60px; 
+        }
+
+        .slide-wrapper {
+            position: relative;
+            width: 95vw;
+            height: 85vh;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+            pointer-events: none;
+            margin-bottom: 10px;
+        }
+
+        .slide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 2;
+        }
+
+        .slide-content {
+            padding: 1.5rem 2rem;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .edit-icon {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 1.5rem;
+            color: rgba(255, 215, 0, 0.7);
+            cursor: pointer;
+            pointer-events: auto;
+            padding: 8px;
+            transition: color 0.3s, transform 0.3s;
+            z-index: 10;
+        }
+
+        .edit-icon:hover {
+            color: #FFD700;
+            transform: scale(1.1);
+        }
+
+        .edit-form {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            background: rgba(20, 20, 20, 0.95);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.15);
+            pointer-events: auto;
+            gap: 1rem;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .edit-form.active {
+            display: flex;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: #111;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: #FFD700;
+            font-family: 'Noto Sans Ethiopic', sans-serif;
+            font-size: 1rem;
+            border-radius: 6px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .edit-input:focus {
+            border-color: #FFD700;
+        }
+
+        .edit-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .global-label {
+            width: 100%;
+            text-align: left;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: -0.5rem;
+            padding-left: 0.2rem;
+        }
+
+        .size-control-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        .size-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #111;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .size-label {
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .size-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .size-btn {
+            background: #333;
+            color: #FFD700;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .size-btn:hover {
+            background: #FFD700;
+            color: #000;
+        }
+
+        .size-input {
+            width: 60px;
+            text-align: center;
+            background: #000;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            color: #FFD700;
+            padding: 0.4rem;
+            border-radius: 6px;
+            font-family: sans-serif;
+            font-weight: bold;
+            -moz-appearance: textfield;
+        }
+
+        .size-input::-webkit-outer-spin-button,
+        .size-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .unit-label {
+            color: rgba(255, 215, 0, 0.6);
+            font-size: 0.85rem;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+
+        .left-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.8rem;
+            font-family: 'Noto Sans Ethiopic', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: 25px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-save {
+            background: #FFD700;
+            color: #000;
+        }
+
+        .btn-save:hover {
+            background: #FFF;
+            box-shadow: 0 0 15px #FFD700;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: #FFD700;
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: #FFD700;
+        }
+
+        .btn-add-page {
+            background: rgba(255, 215, 0, 0.15);
+            color: #FFD700;
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-add-page:hover {
+            background: #FFD700;
+            color: #000;
+        }
+
+        .btn-download {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-download:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        h3 {
+            font-weight: 900;
+            color: #fff;
+            padding: 0.5rem 1.2rem;
+            border-left: 3px solid #FFD700;
+            border-right: 3px solid #FFD700;
+            text-shadow: 0 0 10px #FFD700;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            display: inline-block;
+            letter-spacing: 1px;
+        }
+
+        p {
+            font-size: 2.8rem;
+            margin: 0.6rem 0;
+            line-height: 1.4;
+            color: #FFD700;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(0,0,0,0.9), 0 0 12px rgba(255, 215, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .slide.active p {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        p.chorus {
+            color: #FFF;
+            text-shadow: 0 0 20px #FFD700;
+            font-size: 5rem;
+            font-weight: 900;
+        }
+
+        .footer-recovered {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.85);
+            border-top: 1px solid rgba(255, 215, 0, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            backdrop-filter: blur(4px);
+            flex-shrink: 0;
+            z-index: 40;
+        }
+
+        .footer-info {
+            color: rgba(255, 215, 0, 0.7);
+            font-size: 0.9rem;
+            font-family: sans-serif;
+            font-weight: bold;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 50%;
+        }
+
+        .controls-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px 16px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.1);
+        }
+
+        .page-num {
+            font-family: sans-serif;
+            font-size: 0.95rem;
+            color: #FFD700;
+            font-weight: 700;
+            min-width: 22px;
+            text-align: center;
+            line-height: 1;
+        }
+
+        .progress-container {
+            width: 120px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #FFD700;
+            width: 0%; 
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px #FFD700;
+        }
+
+        @media (max-width: 768px) {
+            .slide-wrapper {
+                height: 82vh;
+                padding-bottom: 70px;
+            }
+
+            .footer-recovered {
+                height: 54px;
+                padding: 0 12px;
+            }
+
+            h1 { font-size: 2.8rem; }
+            h3 { font-size: 2rem; padding: 0.3rem 0.8rem; }
+            p { font-size: 2.4rem; margin: 0.5rem 0; }
+            p.chorus { font-size: 3.4rem; }
+            .progress-container { width: 80px; }
+            .edit-icon { font-size: 1.2rem; }
+            .edit-form { padding: 1.5rem; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 2.2rem; }
+            h3 { font-size: 1.6rem; }
+            p { font-size: 1.8rem; }
+            p.chorus { font-size: 2.6rem; }
+            .controls { padding: 3px 12px; gap: 6px; }
+            .progress-container { width: 60px; }
+            .footer-info { font-size: 0.8rem; max-width: 40%; }
+            .form-buttons { flex-direction: column; gap: 0.5rem; }
+            .left-group { width: 100%; justify-content: center; }
+            .btn { padding: 0.5rem 1.2rem; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+
+    <main class="presentation-container" id="main-container">
+        <div class="slide-wrapper" id="slide-wrapper"></div>
+        
+        <div class="footer-recovered">
+            <div class="footer-info" id="footer-text">⚡ Thomas Edison</div>
+            <div class="controls-wrapper">
+                <nav class="controls">
+                    <span class="page-num" id="current-page">1</span>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    <span class="page-num" id="total-pages">5</span>
+                </nav>
+            </div>
+        </div>
+    </main>
+
+    <!-- External JS File -->
+    <script src="script.js"></script>
+</body>
+</html>
