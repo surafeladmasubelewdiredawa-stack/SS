@@ -308,4 +308,165 @@ function downloadHTML() {
                 if (index === currentIndex) slide.classList.add('active');
             });
             currentPageEl.textContent = currentIndex + 1;
-            const progress = ((currentIndex + 1) / slides.length)
+            const progress = ((currentIndex + 1) / slides.length) * 100;
+            progressBar.style.width = progress + '%';
+        }
+
+        function nextSlide() { if (currentIndex < slides.length - 1) { currentIndex++; updateSlide(); } }
+        function prevSlide() { if (currentIndex > 0) { currentIndex--; updateSlide(); } }
+
+        document.getElementById('main-container').addEventListener('click', (e) => {
+            if (e.target.closest('.footer-recovered')) return;
+            const width = window.innerWidth;
+            const clickX = e.clientX;
+            if (clickX < width * 0.3) prevSlide();
+            else if (clickX > width - width * 0.3) nextSlide();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'n') nextSlide();
+            if (e.key === 'ArrowLeft' || e.key === 'p') prevSlide();
+        });
+
+        updateSlide();
+
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles = [];
+        function resizeCanvas() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+        class Particle { constructor() { this.reset(); } reset() { this.x = Math.random() * width; this.y = Math.random() * height; this.size = Math.random() * 2.2 + 0.4; this.speedX = (Math.random() - 0.5) * 0.3; this.speedY = (Math.random() - 0.5) * 0.3; this.opacity = Math.random() * 0.5 + 0.15; this.twinkle = Math.random() * 0.025 + 0.005; this.direction = 1; } update() { this.x += this.speedX; this.y += this.speedY; this.opacity += this.twinkle * this.direction; if (this.opacity > 0.8 || this.opacity < 0.1) this.direction *= -1; if (this.x < 0) this.x = width; if (this.x > width) this.x = 0; if (this.y < 0) this.y = height; if (this.y > height) this.y = 0; } draw() { ctx.shadowBlur = this.size > 1.8 ? 12 : 0; ctx.shadowColor = 'rgba(255, 215, 0, 0.7)'; ctx.fillStyle = 'rgba(255, 215, 0, ' + this.opacity + ')'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); } }
+        function initParticles() { particles = []; const count = Math.min(140, (width * height) / 7000); for (let i = 0; i < count; i++) particles.push(new Particle()); }
+        function animate() { ctx.clearRect(0, 0, width, height); const grad = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width); grad.addColorStop(0, '#0b0b0b'); grad.addColorStop(1, '#000000'); ctx.fillStyle = grad; ctx.fillRect(0, 0, width, height); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
+        window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+        resizeCanvas(); initParticles(); animate();
+    </script>
+</body>
+</html>`;
+
+    const blob = new Blob([fullHTML], { type: 'text/html' });
+    const anchor = document.createElement('a');
+    anchor.href = URL.createObjectURL(blob);
+    anchor.download = 'Thomas-Edison-Presentation.html';
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    URL.revokeObjectURL(anchor.href);
+}
+
+// -------- UPDATE UI --------
+function updateSlide() {
+    const slides = document.querySelectorAll('.slide');
+    slides.forEach((slide, index) => {
+        slide.classList.remove('active');
+        if (index === currentIndex) {
+            slide.classList.add('active');
+        }
+    });
+
+    footerTextEl.textContent = presentationTitle;
+    currentPageEl.textContent = currentIndex + 1;
+    totalPagesEl.textContent = slidesData.length;
+    const progress = ((currentIndex + 1) / slidesData.length) * 100;
+    progressBar.style.width = `${progress}%`;
+}
+
+function nextSlide() {
+    if (currentIndex < slidesData.length - 1) { currentIndex++; updateSlide(); }
+}
+
+function prevSlide() {
+    if (currentIndex > 0) { currentIndex--; updateSlide(); }
+}
+
+function init() {
+    renderSlides();
+    updateSlide();
+}
+
+const container = document.getElementById('main-container');
+container.addEventListener('click', (e) => {
+    if (e.target.closest('.icons-container') || e.target.closest('.edit-form') || e.target.closest('button') || e.target.closest('.footer-recovered')) return;
+    const width = window.innerWidth;
+    const clickX = e.clientX;
+    const threshold = width * 0.3;
+    if (clickX < threshold) prevSlide();
+    else if (clickX > width - threshold) nextSlide();
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'n' || e.key === 'N') nextSlide();
+    if (e.key === 'ArrowLeft' || e.key === 'p' || e.key === 'P') prevSlide();
+});
+
+init();
+
+// -------- BACKGROUND: golden particles --------
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let width, height;
+let particles = [];
+
+function resizeCanvas() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+}
+
+class Particle {
+    constructor() { this.reset(); }
+    reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.size = Math.random() * 2.2 + 0.4;
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.speedY = (Math.random() - 0.5) * 0.3;
+        this.opacity = Math.random() * 0.5 + 0.15;
+        this.twinkle = Math.random() * 0.025 + 0.005;
+        this.direction = 1;
+    }
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.opacity += this.twinkle * this.direction;
+        if (this.opacity > 0.8 || this.opacity < 0.1) this.direction *= -1;
+
+        if (this.x < 0) this.x = width;
+        if (this.x > width) this.x = 0;
+        if (this.y < 0) this.y = height;
+        if (this.y > height) this.y = 0;
+    }
+    draw() {
+        ctx.shadowBlur = this.size > 1.8 ? 12 : 0;
+        ctx.shadowColor = 'rgba(255, 215, 0, 0.7)';
+        ctx.fillStyle = `rgba(255, 215, 0, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+function initParticles() {
+    particles = [];
+    const count = Math.min(140, (width * height) / 7000);
+    for (let i = 0; i < count; i++) particles.push(new Particle());
+}
+
+function animate() {
+    ctx.clearRect(0, 0, width, height);
+    const grad = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
+    grad.addColorStop(0, '#0b0b0b');
+    grad.addColorStop(1, '#000000');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, height);
+
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animate);
+}
+
+window.addEventListener('resize', () => {
+    resizeCanvas();
+    initParticles();
+});
+
+resizeCanvas();
+initParticles();
+animate();
