@@ -101,7 +101,7 @@ function renderSlides() {
         editForm.classList.add('edit-form');
         editForm.id = `edit-form-${index}`;
 
-        // REMOVED 'Very Small' text spans
+        // Added Delete Button
         editForm.innerHTML = `
             <div class="global-label">Footer Name (Applies to all pages):</div>
             <input type="text" class="edit-input" id="footer-input-${index}" value="${presentationTitle}" placeholder="Footer Title">
@@ -135,6 +135,7 @@ function renderSlides() {
             <div class="form-buttons">
                 <div class="left-group">
                     <button class="btn btn-add-page" onclick="addPage(${index})">+ Add Page</button>
+                    <button class="btn btn-delete" onclick="deletePage(${index})">Delete</button>
                     <button class="btn btn-cancel" onclick="cancelEdit(${index})">Cancel</button>
                 </div>
                 <button class="btn btn-save" onclick="saveChanges(${index})">Save</button>
@@ -226,6 +227,27 @@ function addPage(index) {
     startEditMode(currentIndex);
 }
 
+// -------- DELETE PAGE FUNCTION --------
+function deletePage(index) {
+    if (slidesData.length <= 1) {
+        alert("Cannot delete the last remaining slide.");
+        return;
+    }
+
+    if (confirm("Are you sure you want to delete this slide?")) {
+        slidesData.splice(index, 1);
+        
+        // Adjust currentIndex if necessary
+        if (currentIndex >= slidesData.length) {
+            currentIndex = slidesData.length - 1;
+        }
+        
+        saveToLocalStorage();
+        renderSlides();
+        updateSlide();
+    }
+}
+
 // -------- DOWNLOAD STATIC HTML --------
 function downloadHTML() {
     let slidesHTML = '';
@@ -256,7 +278,7 @@ function downloadHTML() {
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         body { background: #0a0a0a; color: #FFD700; font-family: 'Noto Sans Ethiopic', sans-serif; height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-        .presentation-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; padding-bottom: 60px; }
+        .presentation-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; padding-bottom: 80px; }
         .slide-wrapper { position: relative; width: 95vw; height: 85vh; max-width: 1200px; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; margin-bottom: 10px; }
         .slide { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; opacity: 0; visibility: hidden; transition: opacity 0.6s ease, visibility 0.6s ease; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
         .slide.active { opacity: 1; visibility: visible; z-index: 2; }
@@ -265,7 +287,7 @@ function downloadHTML() {
         h3 { font-weight: 900; color: #fff; padding: 0.5rem 1.2rem; border-left: 3px solid #FFD700; border-right: 3px solid #FFD700; text-shadow: 0 0 10px #FFD700; text-transform: uppercase; margin-bottom: 2rem; display: inline-block; letter-spacing: 1px; }
         p { margin: 0.6rem 0; line-height: 1.4; color: #FFD700; font-weight: 700; text-shadow: 0 0 8px rgba(0,0,0,0.9), 0 0 12px rgba(255, 215, 0, 0.3); opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
         .slide.active p { opacity: 1; transform: translateY(0); }
-        .footer-recovered { position: absolute; bottom: 0; left: 0; width: 100%; height: 60px; background: rgba(0, 0, 0, 0.85); border-top: 1px solid rgba(255, 215, 0, 0.5); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; backdrop-filter: blur(4px); flex-shrink: 0; z-index: 40; }
+        .footer-recovered { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: rgba(0, 0, 0, 0.85); border-top: 1px solid rgba(255, 215, 0, 0.5); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; backdrop-filter: blur(4px); flex-shrink: 0; z-index: 40; }
         .footer-info { color: rgba(255, 215, 0, 0.7); font-size: 0.9rem; font-family: sans-serif; font-weight: bold; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 50%; }
         .controls-wrapper { display: flex; align-items: center; gap: 15px; }
         .controls { display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(0, 0, 0, 0.7); padding: 5px 16px; border-radius: 40px; border: 1px solid rgba(255, 215, 0, 0.4); box-shadow: 0 0 12px rgba(255, 215, 0, 0.1); }
