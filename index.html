@@ -101,20 +101,31 @@
             position: relative;
         }
 
-        .edit-icon {
+        /* Icons Container (Edit Icon & Download Icon) */
+        .icons-container {
             position: absolute;
             top: 0;
             right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .icon-btn {
             font-size: 1.5rem;
             color: rgba(255, 215, 0, 0.7);
             cursor: pointer;
             pointer-events: auto;
             padding: 8px;
             transition: color 0.3s, transform 0.3s;
-            z-index: 10;
+            background: none;
+            border: none;
+            font-family: sans-serif;
         }
 
-        .edit-icon:hover {
+        .icon-btn:hover {
             color: #FFD700;
             transform: scale(1.1);
         }
@@ -189,9 +200,10 @@
             border: 1px solid rgba(255, 215, 0, 0.3);
         }
 
+        /* Changed Label Text to Very Small */
         .size-label {
             color: #fff;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             font-weight: bold;
         }
 
@@ -302,17 +314,6 @@
 
         .btn-add-page:hover {
             background: #FFD700;
-            color: #000;
-        }
-
-        .btn-download {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-color: rgba(255, 255, 255, 0.4);
-        }
-
-        .btn-download:hover {
-            background: #fff;
             color: #000;
         }
 
@@ -452,7 +453,7 @@
             p { font-size: 2.4rem; margin: 0.5rem 0; }
             p.chorus { font-size: 3.4rem; }
             .progress-container { width: 80px; }
-            .edit-icon { font-size: 1.2rem; }
+            .icon-btn { font-size: 1.2rem; }
             .edit-form { padding: 1.5rem; }
         }
 
