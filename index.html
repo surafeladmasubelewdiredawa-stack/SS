@@ -182,10 +182,11 @@
             padding-left: 0.2rem;
         }
 
+        /* SIZE CONTROLS - MINI STYLE */
         .size-control-wrapper {
             display: flex;
             flex-direction: column;
-            gap: 0.8rem;
+            gap: 0.5rem; /* Reduced gap */
             width: 100%;
             margin-bottom: 0.5rem;
         }
@@ -193,40 +194,34 @@
         .size-control {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-end; /* Align right since no text */
             background: #111;
-            padding: 0.5rem 1rem;
+            padding: 0.3rem 0.5rem; /* Tighter padding */
             border-radius: 6px;
             border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-
-        /* Changed Label Text to Very Small */
-        .size-label {
-            color: #fff;
-            font-size: 0.75rem;
-            font-weight: bold;
         }
 
         .size-input-group {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.3rem; /* Tighter gap */
         }
 
         .size-btn {
             background: #333;
             color: #FFD700;
             border: 1px solid rgba(255, 215, 0, 0.4);
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
+            width: 20px; /* Mini width */
+            height: 20px; /* Mini height */
+            border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 0.8rem; /* Mini font */
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
+            padding: 0;
         }
 
         .size-btn:hover {
@@ -235,15 +230,16 @@
         }
 
         .size-input {
-            width: 60px;
+            width: 40px; /* Mini width */
             text-align: center;
             background: #000;
             border: 1px solid rgba(255, 215, 0, 0.4);
             color: #FFD700;
-            padding: 0.4rem;
-            border-radius: 6px;
+            padding: 0.2rem; /* Tighter padding */
+            border-radius: 4px;
             font-family: sans-serif;
             font-weight: bold;
+            font-size: 0.75rem; /* Mini font */
             -moz-appearance: textfield;
         }
 
@@ -255,8 +251,11 @@
 
         .unit-label {
             color: rgba(255, 215, 0, 0.6);
-            font-size: 0.85rem;
+            font-size: 0.7rem; /* Mini unit */
+            margin-left: 0.2rem;
         }
+
+        /* END SIZE CONTROLS */
 
         .form-buttons {
             display: flex;
@@ -375,7 +374,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 30px;
+            padding: 0 20px; /* Adjusted padding for responsiveness */
             backdrop-filter: blur(4px);
             flex-shrink: 0;
             z-index: 40;
@@ -390,7 +389,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 50%;
+            max-width: 50%; /* Prevents pushing controls away */
         }
 
         .controls-wrapper {
@@ -437,6 +436,7 @@
             box-shadow: 0 0 10px #FFD700;
         }
 
+        /* --- MOBILE RESPONSIVE TWEAKS FOR FOOTER --- */
         @media (max-width: 768px) {
             .slide-wrapper {
                 height: 82vh;
@@ -445,7 +445,7 @@
 
             .footer-recovered {
                 height: 54px;
-                padding: 0 12px;
+                padding: 0 12px; /* Tighter padding */
             }
 
             h1 { font-size: 2.8rem; }
@@ -462,9 +462,22 @@
             h3 { font-size: 1.6rem; }
             p { font-size: 1.8rem; }
             p.chorus { font-size: 2.6rem; }
-            .controls { padding: 3px 12px; gap: 6px; }
-            .progress-container { width: 60px; }
-            .footer-info { font-size: 0.8rem; max-width: 40%; }
+            
+            .footer-info { 
+                font-size: 0.75rem; 
+                max-width: 40%; 
+            }
+            .controls { 
+                padding: 3px 10px; 
+                gap: 4px; 
+            }
+            .progress-container { 
+                width: 50px; 
+            }
+            .page-num { 
+                font-size: 0.8rem; 
+                min-width: 15px; 
+            }
             .form-buttons { flex-direction: column; gap: 0.5rem; }
             .left-group { width: 100%; justify-content: center; }
             .btn { padding: 0.5rem 1.2rem; font-size: 0.8rem; }
